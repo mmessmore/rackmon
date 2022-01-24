@@ -14,11 +14,10 @@ dist/rackmon.linux.arm.release: .pretty $(GO_FILES) dist
 	GOARCH=arm GOOS=linux go build -ldflags="-s -w" -o $@
 	upx --brute $@
 
-
 .pretty: $(GO_FILES)
 	find . -name "*.go" -print0 | xargs -0 goimports -w
 	touch .pretty
 
 .PHONY: clean
 clean:
-	rm -fr updatemgr dist .pretty
+	rm -fr rackmon dist .pretty

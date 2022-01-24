@@ -17,11 +17,6 @@ type Device struct {
 	Name string
 }
 
-type TempHumidity struct {
-	TimeStamp   int64
-	Temperature float64
-}
-
 func FindDevice() (Device, error) {
 	device := Device{}
 
@@ -46,6 +41,7 @@ func (device Device) Read() (TempHumidity, error) {
 
 	th := TempHumidity{
 		TimeStamp:   time.Now().Unix(),
+		Device:      device.Name,
 		Temperature: 0,
 	}
 
@@ -87,4 +83,22 @@ func convertTemp(text string) (float64, error) {
 		return 0, err
 	}
 	return float64(temp) / float64(1000), nil
+}
+
+type TempHumidity struct {
+	TimeStamp   int64
+	Device      string
+	Temperature float64
+}
+
+func (t TempHumidity) Graphite(prefix ...string) string {
+	var metric string
+
+	if len(prefix) < 1 {
+		metric = fmt.Sprintf("sensor.temp.%s", t.Device)
+	} else {
+		metric = strings.Join(prefix, ".")
+	}
+
+	return fmt.Sprintf("%s %.2f %d", metric, t.Temperature, t.TimeStamp)
 }
