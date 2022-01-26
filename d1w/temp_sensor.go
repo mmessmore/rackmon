@@ -1,4 +1,4 @@
-package main
+package d1w
 
 import (
 	"errors"
@@ -13,12 +13,12 @@ import (
 
 const w1_device_root = "/sys/bus/w1/devices/"
 
-type Device struct {
+type W1Device struct {
 	Name string
 }
 
-func FindDevice() (Device, error) {
-	device := Device{}
+func FindW1Device() (W1Device, error) {
+	device := W1Device{}
 
 	entries, err := ioutil.ReadDir(w1_device_root)
 	if os.IsNotExist(err) {
@@ -37,7 +37,7 @@ func FindDevice() (Device, error) {
 	return device, err
 }
 
-func (device Device) Read() (TempHumidity, error) {
+func (device W1Device) Read() (TempHumidity, error) {
 
 	th := TempHumidity{
 		TimeStamp:   time.Now().Unix(),
@@ -91,14 +91,7 @@ type TempHumidity struct {
 	Temperature float64
 }
 
-func (t TempHumidity) Graphite(prefix ...string) string {
-	var metric string
-
-	if len(prefix) < 1 {
-		metric = fmt.Sprintf("sensor.temp.%s", t.Device)
-	} else {
-		metric = strings.Join(prefix, ".")
-	}
-
+func (t TempHumidity) Graphite(prefix string) string {
+	metric := fmt.Sprintf("%s.%s", prefix, t.Device)
 	return fmt.Sprintf("%s %.2f %d", metric, t.Temperature, t.TimeStamp)
 }
