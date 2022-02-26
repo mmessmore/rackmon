@@ -1,6 +1,7 @@
 package nut
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os/exec"
@@ -26,12 +27,16 @@ func PollUPS(prefix string, name string) {
 		}
 		key = fmt.Sprintf("%s.%s", prefix, key)
 
-		fmt.Printf("%s: %f:.2d", key, val)
+		fmt.Printf("%s: %.2f\n", key, val)
 	}
 }
 
 func parseLine(line string) (string, float64, error) {
 	pieces := strings.Split(line, ": ")
+	if len(pieces) < 2 {
+		return "", 0, errors.New("Not enough fields in row")
+	}
+
 	key := pieces[0]
 	val, err := strconv.ParseFloat(pieces[1], 64)
 

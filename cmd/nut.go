@@ -56,7 +56,7 @@ and skip non-temperature sensors.
 		name, _ := cmd.Flags().GetString("upsname")
 
 		prefix = makePrefix(prefix, "nut", short)
-		nut.PollUPS(prefix, name)
+		nut.Run(prefix, name)
 	},
 }
 
