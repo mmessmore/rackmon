@@ -5,14 +5,14 @@ Copyright © 2022 Michael Messmore <mike@messmore.org>
 package cmd
 
 import (
-	"github.com/mmessmore/rackmon/d1w"
+	"github.com/mmessmore/rackmon/nut"
 	"github.com/spf13/cobra"
 )
 
-// d1wCmd represents the d1w command
-var d1wCmd = &cobra.Command{
-	Use:   "d1w",
-	Short: "Dallas 1-Wire temp sensor",
+// nutCmd represents the nut command
+var nutCmd = &cobra.Command{
+	Use:   "nut",
+	Short: "NUT UPS client",
 	Long: `Runs via the execd plugin to Telegraf for a Dallas 1-Wire
 temperature sensor.  This will emit graphite formatted metric on SIGUSR1
 or SIGHUP.
@@ -43,7 +43,7 @@ It should support multiples, allow mappings of device names to friendly names,
 and skip non-temperature sensors.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
-		defaultPrefix := makePrefix(defaultPrefixFormat, "d1w", false)
+		defaultPrefix := makePrefix(defaultPrefixFormat, "nut", false)
 		prefix, _ := cmd.Flags().GetString("prefix")
 
 		// if they didn't change the default, set it back to do the
@@ -53,15 +53,17 @@ and skip non-temperature sensors.
 			prefix = defaultPrefixFormat
 		}
 		short, _ := cmd.Flags().GetBool("short")
+		name, _ := cmd.Flags().GetString("upsname")
 
-		prefix = makePrefix(prefix, "d1w", short)
-		d1w.Run(prefix)
+		prefix = makePrefix(prefix, "nut", short)
+		nut.PollUPS(prefix, name)
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(d1wCmd)
-	defaultPrefix := makePrefix(defaultPrefixFormat, "d1w", false)
-	d1wCmd.Flags().StringP("prefix", "p", defaultPrefix, "Metric prefix")
-	d1wCmd.Flags().BoolP("short", "s", false, "Use short hostname in prefix")
+	rootCmd.AddCommand(nutCmd)
+	defaultPrefix := makePrefix(defaultPrefixFormat, "nut", false)
+	nutCmd.Flags().StringP("prefix", "p", defaultPrefix, "Metric prefix")
+	nutCmd.Flags().BoolP("short", "s", false, "Use short hostname in prefix")
+	nutCmd.Flags().StringP("upsname", "n", "main", "UPS name from NUT")
 }
