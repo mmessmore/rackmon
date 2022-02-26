@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func PollUPS(prefix string, name string) {
@@ -18,6 +19,8 @@ func PollUPS(prefix string, name string) {
 		log.Printf("ERROR failed polling ups %s: %v", name, err)
 	}
 
+	ts := time.Now().Unix()
+
 	output := strings.Split(string(out), "\n")
 	for _, line := range output {
 		log.Printf("INFO %s", line)
@@ -27,7 +30,7 @@ func PollUPS(prefix string, name string) {
 		}
 		key = fmt.Sprintf("%s.%s", prefix, key)
 
-		fmt.Printf("%s: %.2f\n", key, val)
+		fmt.Printf("%s %.2f %d\n", key, val, ts)
 	}
 }
 
